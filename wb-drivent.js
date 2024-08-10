@@ -1,5 +1,5 @@
 (function (){
-  var driventsName = ['drivent-bdc', 'drivent-bd0']
+  var driventsNames = ['drivent-bdc', 'drivent-bd0']
   var virtualDeviceBodyTemplate =
 	{
 	  title: "",
@@ -38,33 +38,28 @@
 		}
 	}
   };
-  driventsName.forEach(function(driventName) {
+  driventsNames.forEach(function(driventName) {
     
-    log.debug("Create drivent: {}".format(driventName));
     virtualDeviceBodyTemplate.title = driventName;
   	defineVirtualDevice(driventName, virtualDeviceBodyTemplate);
     
     trackMqtt(driventName + "/LWT", function(message) {
-      log.debug("message.value: {}:{}".format(message.topic, message.value));
       if (message.value == 0)
         dev["{}/state".format(driventName)] = "Не на связи"
       ;
     });
     
     trackMqtt(driventName + "/CurrentPosition", function(message) {
-      log.debug("message.value: {}:{}".format(message.topic, message.value));
-      dev["{}/Level".format(driventName)] = Number(message.value)
+      getDevice(driventName).getControl("Level").setValue({value: Number(message.value), notify: false});
     });
 
     trackMqtt(driventName + "/getObstructionDetected", function(message) {
-      log.debug("message.value: {}:{}".format(message.topic, message.value));
       if (message.value == true)
         dev["{}/state".format(driventName)] = "Защемление"
       ;
     });
 
     trackMqtt(driventName + "/State", function(message) {
-      log.debug("message.value: {}:{}".format(message.topic, message.value));
       if (message.value == "INCREASING")
         dev["{}/state".format(driventName)] = "Открывается"
       else if (message.value == "DECREASING")
@@ -76,6 +71,13 @@
       else if (message.value == "ALARM2")
         dev["{}/state".format(driventName)] = "Перегрузка привода"
       ;
+    });
+    
+    defineRule("click_{}_Level".format(driventName), {
+        whenChanged: "{}/Level".format(driventName),
+        then: function (newValue, devName, ControlName) {
+          publish("{}/setTargetPosition".format(driventName), newValue);
+        }
     });
     
     defineRule("click_{}_btnOpen".format(driventName), {
