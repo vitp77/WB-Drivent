@@ -4,11 +4,11 @@
 Как подключить:
 1. В самих устройствах Drivent необходимо настроить подключение к MQTT
 2. Скопировать скрипт wb-drivent.js на устройство WirenBoard в папку /mnt/data/etc/wb-rules
-3. Открыть скрипт редактором и во второй строке для переменной driventsName задать имена Ваших устройств Drivent
+3. Открыть скрипт редактором и во второй строке для переменной driventsName задать имена и заголвоки Ваших устройств Drivent
    
 ```js
 (function (){
-  var driventsName = ['drivent-bdc', 'drivent-bd0']
+  var driventsNames = {'drivent-bdc':'Гостиная (drivent)', 'drivent-bd0':'Гостевая (drivent)'}
   var virtualDeviceBodyTemplate =
 	{
 
