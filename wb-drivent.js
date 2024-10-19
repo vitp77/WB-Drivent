@@ -1,5 +1,5 @@
 (function (){
-  var driventsNames = ['drivent-bdc', 'drivent-bd0']
+  var driventsNames = {'drivent-bdc':'Гостиная (drivent)', 'drivent-bd0':'Гостевая (drivent)'}
   var virtualDeviceBodyTemplate =
     {
       title: "",
@@ -38,8 +38,8 @@
           }
        }
     };
-  driventsNames.forEach(function(driventName) {
-    virtualDeviceBodyTemplate.title = driventName;
+  Object.keys(driventsNames).forEach(function(driventName) {
+    virtualDeviceBodyTemplate.title = driventsNames[driventName];
     defineVirtualDevice(driventName, virtualDeviceBodyTemplate);
     trackMqtt(driventName + "/LWT", function(message) {
       if (message.value == 0)
